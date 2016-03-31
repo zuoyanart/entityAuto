@@ -1,0 +1,16 @@
+.mui-grid-9 li {
+  padding: 6px 15px !important; }
+.mui-grid-9 span {
+  color: #20b8bd; }
+
+#slider img {
+  width: 100%; }
+
+#list .mui-media-object, #list img {
+  width: 60px;
+  max-width: 60px;
+  height: 60px;
+  line-height: 60px; }
+#list .mui-ellipsis {
+  white-space: normal;
+  max-height: 43px; }

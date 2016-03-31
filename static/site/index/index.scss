@@ -1,0 +1,26 @@
+@import "../../sass/variables.scss";
+.#{$namespace}grid-9{
+    li{
+        padding: 6px 15px!important;
+    }
+    span{
+        color:$bar-bg;
+    }
+}
+#slider{
+img{
+    width: 100%;
+};
+}
+#list {
+  .mui-media-object,img{
+    width: 60px;
+    max-width: 60px;
+    height: 60px;
+    line-height: 60px;
+  }
+  .mui-ellipsis{
+    white-space: normal;
+    max-height:43px;
+  }
+}

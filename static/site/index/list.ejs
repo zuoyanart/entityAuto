@@ -1,0 +1,11 @@
+<% for(var i=0,ll=data.length;i<ll;i++) {%>
+  <li class="mui-table-view-cell mui-media" id="<%= data[i].id%>">
+    <a class="mui-navigate-right">
+      <img class="mui-media-object mui-pull-left" src="<%= data[i].timg%>">
+      <div class="mui-media-body">
+        <%= data[i].title%>
+        <p class="mui-ellipsis"><%= data[i].brief%></p>
+      </div>
+    </a>
+  </li>
+  <%}%>

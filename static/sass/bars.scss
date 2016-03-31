@@ -1,0 +1,15 @@
+// Variables
+@import "variables.scss";
+.#{$namespace}bar {
+    background-color: $bar-bg;
+}
+
+.#{$namespace}bar-tab {
+    .#{$namespace}tab-item{
+        color:#fff;
+    }
+}
+
+.#{$namespace}mui-table-view:first-child{
+  margin-top: 15px;
+}
