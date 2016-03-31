@@ -1,3 +1,15 @@
 /*.pak
 /*.dll
 /locales
+/css
+/font
+/site
+/modules
+/pkg
+/widget
+/view
+/credits.html
+/icudtl.dat
+/natives_blob.bin
+/nw.exe
+/snapshot_blob.bin
