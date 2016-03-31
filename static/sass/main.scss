@@ -1,0 +1,76 @@
+@import "variables.scss";
+.#{$namespace}main {
+  width: 100%;
+  padding: 30px;
+  & > div {
+    margin: 20px 0;
+  }
+  .btn {
+    height: 32px;
+    padding: 6px 12px;
+  }
+  & > .setting {
+    width: 800px;
+    li{
+      height: 40px;
+    }
+    .cfile {
+      position: relative;
+      & > input[type="text"] {
+        width: 500px;
+      }
+      .file {
+        opacity: 0.1;
+        position: absolute;
+        top: 0;
+        height:50px;
+        left: 510px;
+      }
+    }
+
+  }
+  & > fieldset {
+    border: 1px solid #000;
+    padding: 10px;
+    & > input {
+      margin: 0 0 20px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      td {
+        height: 30px;
+        border-collapse: collapse;
+        margin: 3px 0;
+      }
+      thead {
+        td {
+          text-align: center;
+        }
+      }
+      tbody {
+        td {
+          padding: 3px 1px;
+          .btn {
+            height: 32px;
+            padding: 6px 12px;
+          }
+        }
+      }
+      tfoot {
+        td {
+          text-align: right;
+          padding: 10px 10px 5px 0;
+          background-color: #ccc;
+          .btn {
+            height: 32px;
+            padding: 6px 12px;
+          }
+        }
+      }
+      thead {
+        background-color: #ccc;
+      }
+    }
+  }
+}

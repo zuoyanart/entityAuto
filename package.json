@@ -1,6 +1,6 @@
 {
   "name": "entityAuto",
-  "main": "./views/index.html",
+  "main": "./view/index.html",
   "window": {
     "toolbar": true,
     "width": 800,

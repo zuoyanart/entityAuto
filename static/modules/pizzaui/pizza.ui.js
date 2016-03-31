@@ -5,7 +5,6 @@
  * @version $Id$
  */
 
-var jQuery = require('jquery');
 ;(function($) {
     $.fn.wordsTip = function(options) {
         var oInput = this;//输入框对应的DOM
@@ -71,7 +70,6 @@ var jQuery = require('jquery');
  */
 ;
 (function($) {
-  var tools = require('pizzatools');
   $.fn.pizzaValidate = function(options) {
 
     var defaults = {
@@ -253,7 +251,6 @@ var jQuery = require('jquery');
    * @param type 提示信息的名称
    */
   $.fn.pizzaValidate.addTips = function(obj, type) {
-      var pizzalayer = require('pizzalayer');
       var objp = null;
       if (obj.attr('type') == 'hidden') {
         objp = obj.parent();
@@ -1221,7 +1218,6 @@ var jQuery = require('jquery');
  * @version $Id$
  */
 
-var tools = require('pizzatools');
 
 ;(function($) {
 	$.fn.pizzaArea = function(options) {

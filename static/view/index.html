@@ -9,14 +9,94 @@
 <body>
   <link rel="import" href="/widget/head/head.html?__inline">
   <link rel="import" href="/widget/footer/footer.html?__inline">
-  <div class="mui-content">
+  <div class="main">
+    <ul class="setting">
+      <li class="cfile">
+        <input type="text" id="file" placeholder="请选择生成目录">
+        <button class="btn btn-info">请选择生成目录</button>
+        <input type="file" webkitdirectory class="file">
+      </li>
+      <li>
+        <select name="" id="" class="select">
+          <option value="" selected="selected">请选择数据库类型</option>
+          <option value="mongodb">Mongodb</option>
+          <option value="mysql">mysql</option>
+        </select>
+      </li>
+    </ul>
+    <fieldset class="tab mongodb">
+      <legend>健康信息</legend>
+      <input type="text" placeholder="请输入表名">
+      <table>
+        <thead>
+          <tr>
+            <td style="width:150px;">字段</td>
+            <td style="width:120px;">类型</td>
+            <td style="width:300px;">json</td>
+            <td style="">注释</td>
+            <td style="width:100px;">操作</td>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <input type="text">
+            </td>
+            <td>
+              <select class="select1" style="120px">
+                <option value="objectid">objectid</option>
+                <option value="string">string</option>
+                <option value="int">int</option>
+                <option value="[]string">[]string</option>
+                <option value="[]int">[]int</option>
+              </select>
+            </td>
+            <td>
+              <input type="text">
+            </td>
+            <td>
+              <input type="text">
+            </td>
+            <td><a href="#" class="btn btn-info">删除</a></td>
+          </tr>
+          <tr>
+            <td>
+              <input type="text">
+            </td>
+            <td>
+              <select class="select1" style="120px">
+                <option value="objectid">objectid</option>
+                <option value="string">string</option>
+                <option value="int">int</option>
+                <option value="[]string">[]string</option>
+                <option value="[]int">[]int</option>
+              </select>
+            </td>
+            <td>
+              <input type="text">
+            </td>
+            <td>
+              <input type="text">
+            </td>
+            <td><a href="#" class="btn btn-info delrow">删除</a></td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="5">
+              <button class="btn btn-info addrow">添加行</button>
+              <button class="btn btn-info">生成文件</button>
+            </td>
+          </tr>
+        </tfoot>
+      </table>
+    </fieldset>
+    <div class="tab mysql">
 
+    </div>
   </div>
   <script src="site/index/index.js" charset="utf-8"></script>
   <script type="text/javascript">
-    //获得slider插件对象
-    //index.init();
-    var index = require('index/index');
     index.init();
   </script>
 </body>

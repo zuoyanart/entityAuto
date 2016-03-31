@@ -1,0 +1,31 @@
+/*!site/index/index.css*/
+.mui-grid-9 li {
+  padding: 6px 15px !important; }
+.mui-grid-9 span {
+  color: #20b8bd; }
+
+#slider img {
+  width: 100%; }
+
+#list .mui-media-object, #list img {
+  width: 60px;
+  max-width: 60px;
+  height: 60px;
+  line-height: 60px; }
+#list .mui-ellipsis {
+  white-space: normal;
+  max-height: 43px; }
+
+/*!site/news/detail/detail.css*/
+#detail {
+  padding: 10px 15px; }
+  #detail h2 {
+    font-size: 22px; }
+  #detail .content {
+    color: #2e2c2c;
+    margin-top: 20px; }
+    #detail .content p, #detail .content span {
+      color: inherit; }
+    #detail .content img {
+      width: 100%; }
+
