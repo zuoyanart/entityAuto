@@ -22,12 +22,12 @@ fis.match('**/*', { //启用相对路径支持
     })
     //modules下面都是模块化资源
     .match(/^\/modules\/(.*)\.(js)$/i, {
-        isMod: true,
+        isMod: false,
         id: '$1', //id支持简写，去掉modules和.js后缀中间的部分
         release: '${statics}/$&'
     })
     .match(/^\/site\/(.*)\.(js)$/i, {
-        isMod: true,
+        isMod: false,
         id: '$1',
         release: '${statics}/$&'
     })
@@ -58,7 +58,7 @@ fis.match('::packager', {
     packager: fis.plugin('map', {
         useTrack: false,
         'pkg/base.js': ['lib/mui.min.js', 'lib/html5sql.js', 'lib/zepto.min.js', 'lib/config.js'],
-        'pkg/base.css': ['/css/mui.min.css', '/css/371sports.css']
+        'pkg/base.css': ['/css/pizza.css', '/css/entity.css','/css/font-awesome.css']
     }),
     spriter: fis.plugin('csssprites', {
         layout: 'matrix',
