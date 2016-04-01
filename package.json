@@ -15,7 +15,9 @@
   "user-agent": "%name",
   "dependencies": {
     "async": "*",
-    "ejs": "*",
+    "ejs": "^2.4.1",
+    "ejs2": "^2.1.0",
+    "fs-extra": "^0.26.7",
     "mysql": "^2.10.2"
   }
 }

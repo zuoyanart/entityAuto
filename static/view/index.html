@@ -3,89 +3,57 @@
 
 <head>
   <link rel="import" href="/widget/meate/meate.html?__inline">
-  <link rel="stylesheet" href="../site/index/index.css">
 </head>
 
 <body>
   <link rel="import" href="/widget/head/head.html?__inline">
   <link rel="import" href="/widget/footer/footer.html?__inline">
   <div class="main">
-    <ul class="setting">
-      <li class="cfile">
-        <input type="text" id="file" placeholder="请选择生成目录">
+    <div class="setting form">
+      <div class="cfile">
+        <label for="">生成目录</label><input type="text" id="file" placeholder="请选择生成目录" value="F:\golang\src\rmApi">
         <button class="btn btn-info">请选择生成目录</button>
         <input type="file" webkitdirectory class="file">
-      </li>
-      <li>
-        <select name="" id="" class="select">
-          <option value="" selected="selected">请选择数据库类型</option>
-          <option value="mongodb">Mongodb</option>
+      </div>
+      <div>
+        <label for="">数据库类型</label>
+        <select name="" id="dbtype" class="select">
+          <option value="" >请选择数据库类型</option>
+          <option value="mongodb" selected="selected">Mongodb</option>
           <option value="mysql">mysql</option>
         </select>
-      </li>
-    </ul>
+      </div>
+    </div>
     <fieldset class="tab mongodb">
-      <legend>健康信息</legend>
-      <input type="text" placeholder="请输入表名">
+      <legend>&nbsp;&nbsp;mongodb&nbsp;&nbsp;</legend>
+      <div class="form">
+        <div><label for="">历史记录</label><select name="" id="mongodbhisstore">
+          <option value="" selected="selected">切换到历史记录</option>
+          <option value="clear">清除一月前历史记录</option>
+        </select></div>
+        <div><label for="">表名</label><input type="text" placeholder="务必使用大驼峰式命名法" id="mongodb-tablename" class="tablename" value="Education"></div>
+        <div><label for="">中文名称</label><input type="text" placeholder="请输入中文名称" id="mongodb-china" class="china" value="教育经历"></div>
+        <div><label for="">url地址</label><input type="text" placeholder="请输入连接地址" id="mongodb-url" class="url" value="educate"></div>
+      </div>
       <table>
         <thead>
           <tr>
             <td style="width:150px;">字段</td>
-            <td style="width:120px;">类型</td>
+            <td style="width:90px;">类型</td>
+            <td style="width:230px">验证规则</td>
             <td style="width:300px;">json</td>
             <td style="">注释</td>
             <td style="width:100px;">操作</td>
           </tr>
         </thead>
-        <tbody>
-          <tr>
-            <td>
-              <input type="text">
-            </td>
-            <td>
-              <select class="select1" style="120px">
-                <option value="objectid">objectid</option>
-                <option value="string">string</option>
-                <option value="int">int</option>
-                <option value="[]string">[]string</option>
-                <option value="[]int">[]int</option>
-              </select>
-            </td>
-            <td>
-              <input type="text">
-            </td>
-            <td>
-              <input type="text">
-            </td>
-            <td><a href="#" class="btn btn-info">删除</a></td>
-          </tr>
-          <tr>
-            <td>
-              <input type="text">
-            </td>
-            <td>
-              <select class="select1" style="120px">
-                <option value="objectid">objectid</option>
-                <option value="string">string</option>
-                <option value="int">int</option>
-                <option value="[]string">[]string</option>
-                <option value="[]int">[]int</option>
-              </select>
-            </td>
-            <td>
-              <input type="text">
-            </td>
-            <td>
-              <input type="text">
-            </td>
-            <td><a href="#" class="btn btn-info delrow">删除</a></td>
-          </tr>
+        <tbody class="mongodbkey">
+
         </tbody>
         <tfoot>
           <tr>
-            <td colspan="5">
+            <td colspan="6">
               <button class="btn btn-info addrow">添加行</button>
-              <button class="btn btn-info">生成文件</button>
+              <button class="btn btn-info generate">生成文件</button>
             </td>
           </tr>
         </tfoot>
