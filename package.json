@@ -1,0 +1,21 @@
+{
+  "name": "entityAuto",
+  "main": "./view/index.html",
+  "window": {
+    "toolbar": true,
+    "width": 800,
+    "height": 500,
+    "frame": true,
+    "icon": "",
+    "kiosk": false
+  },
+  "webkit": {
+    "plugin": true
+  },
+  "user-agent": "%name",
+  "dependencies": {
+    "async": "*",
+    "ejs": "*",
+    "mysql": "^2.10.2"
+  }
+}
