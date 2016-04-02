@@ -3,8 +3,8 @@
   "main": "./view/index.html",
   "window": {
     "toolbar": true,
-    "width": 800,
-    "height": 500,
+    "width": 1000,
+    "height": 600,
     "frame": true,
     "icon": "",
     "kiosk": false

@@ -55,7 +55,7 @@ fis.match('::packager', {
   postpackager: fis.plugin('loader', {
     resourceType: 'mod',
     obtainScript: true,
-    allInOne: true,
+    allInOne: false,
     useInlineMap: true, // 资源映射表内嵌
   }),
   packager: fis.plugin('map', {
