@@ -4,6 +4,9 @@
 ## 开发技术
 nw.js (0.12.3)
 
+## pizzaCmsAPi
+golang APi框架具体介绍请参考：[https://github.com/zuoyanart/pizzaCmsApi](https://github.com/zuoyanart/pizzaCmsApi)
+
 ##截图
 
 ![](http://www.zuoyan.space/mdimg/entity1.jpg)
