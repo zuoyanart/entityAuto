@@ -183,9 +183,9 @@ var index = (function() {
     var validateVal = $.trim(validateObj.val());
 
     if (keyVal == "id") {
-      jsonObj.val('bson:"_id" json:"id" validate:"omitempty,min=24,max=24"');
+      jsonObj.val('bson:"_id" json:"id" validate:"omitempty,min=12,max=12"');
     } else if (validateVal != '') {
-      jsonObj.val('json:"' + keyVal + '" validate:"' + validateVal + '"');
+      jsonObj.val('json:"' + keyVal + '" validate:"' + validateVal.replace(/ /ig, "") + '"');
     } else {
       jsonObj.val('json:"' + keyVal + '" ');
     }
