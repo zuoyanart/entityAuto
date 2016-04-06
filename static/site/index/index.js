@@ -181,7 +181,7 @@ var index = (function() {
     var validateVal = $.trim(validateObj.val());
 
     if (keyVal == "id") {
-      jsonObj.val('bson:"_id" json:"id" validate:"omitempty,min=12,max=12"');
+      jsonObj.val('bson:"_id" json:"id"');
     } else if (validateVal != '') {
       jsonObj.val('json:"' + keyVal + '" validate:"' + validateVal.replace(/ /ig, "") + '"');
     } else {
