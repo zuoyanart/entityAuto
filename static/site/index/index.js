@@ -35,8 +35,6 @@ var index = (function() {
         }
       });
 
-      $(".mysql").css("display", "block");
-
 
       $(".file").change(function() { //点击选择文件目录
         var val = $(this).val();

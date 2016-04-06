@@ -2,6 +2,7 @@ package controller
 
 import (
 	"github.com/ivpusic/neo"
+	"gopkg.in/mgo.v2/bson"
 	"<%= rootpath%>/model"
 )
 
@@ -19,7 +20,7 @@ import (
  */
 func <%= tablename%>Get(ctx *neo.Ctx) (int, error) {
 	id := ctx.Req.Params.Get("id")
-	err1 := validate.Field(id, <%- data[0].json.split('validate:')[1]%>)
+	err1 := validate.Field(id, "omitempty,min=24,max=24")
 	if err1 != nil {
 		return 200, ctx.Res.Json(errorValidate())
 	}
@@ -48,7 +49,8 @@ func <%= tablename%>Update(ctx *neo.Ctx) (int, error) {
 	if err1 != nil {
 		return 200, ctx.Res.Json(`{"state": false, "msg": ` + err1.Error() + `}`)
 	}
-	return 200, ctx.Res.Json(`{"state": false}`)
+	apijson := model.<%= tablename%>Update(bson.M{"_id": <%= tablename.toLowerCase()%>.Id, "uid": <%= tablename.toLowerCase()%>.Uid}, bson.M{"$set": bson.M{<%for(var i=0,ll=data.length;i<ll;i++) {%><% if(data[i].key != "id" && data[i].key != "uid" && data[i].key != "state"&& data[i].key != "count") {%>"<%= data[i].key.toLowerCase()%>": <%= tablename.toLowerCase()%>.<%= data[i].key.toLowerCase().replace(/^\S/,function(s){return s.toUpperCase();})%>,<%}%><%}%>}})
+	return 200, ctx.Res.Json(apijson)
 }
 /**
 * @api {post} /<%= url%> 创建<%= china%>
