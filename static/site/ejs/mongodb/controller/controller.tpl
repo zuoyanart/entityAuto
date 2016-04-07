@@ -20,7 +20,7 @@ import (
  */
 func <%= tablename%>Get(ctx *neo.Ctx) (int, error) {
 	id := ctx.Req.Params.Get("id")
-	err1 := validate.Field(id, "omitempty,min=24,max=24")
+	err1 := validate.Field(id, "required,len=24")
 	if err1 != nil {
 		return 200, ctx.Res.Json(errorValidate())
 	}
@@ -96,7 +96,7 @@ func <%= tablename%>Page(ctx *neo.Ctx) (int, error) {
 	mp := Tools.ParseInt(ctx.Req.FormValue("mp"), 20)
 	uid := ctx.Req.FormValue("uid")
 
-	err1 := validate.Field(uid, "required, min=24,max=24")
+	err1 := validate.Field(uid, "required,len=24")
 	err2 := validate.Field(cp, "required,min=1")
 	err3 := validate.Field(mp, "required,min=1,max=50")
 	if err1 != nil || err2 != nil || err3 != nil {
@@ -121,8 +121,8 @@ func <%= tablename%>Page(ctx *neo.Ctx) (int, error) {
 func <%= tablename%>Del(ctx *neo.Ctx) (int, error) {
 	ids := ctx.Req.FormValue("id")
 	uid := ctx.Req.FormValue("uid")
-	err1 := validate.Field(ids, "required, min=24,max=300")
-	err2 := validate.Field(uid, "required, min=24,max=24")
+	err1 := validate.Field(ids, "required,min=24,max=300")
+	err2 := validate.Field(uid, "required,len=24")
 	if err1 != nil || err2 != nil{
 		return 200, ctx.Res.Json(errorValidate())
 	}
