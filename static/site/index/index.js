@@ -76,7 +76,8 @@ var index = (function() {
                   layer.closeAll();
                   resetPizzaSelect($("#mysql-tablename"), "mysql-tablename");
                   var ss = '<option value="" selected="selected">请选择表</option>';
-                  for (var i = 0, ll = result.length; i < ll; i++) {
+                  console.log(tablename);
+                  for (var i = 0, ll = tablename.length; i < ll; i++) {
                     ss += '<option value="' + tablename[i].TABLE_NAME + '">' + tablename[i].TABLE_NAME + '</option>';
                   }
                   $("#mysql-tablename").html(ss);
