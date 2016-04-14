@@ -25,7 +25,7 @@ type json<%= firstUpTableName%>List struct {
 
 func Test<%= firstUpTableName%>Create(t *testing.T) {
 	Convey("创建<%= china%>", t, func() {
-		_, body, _ := request.Post(Url + "<%= url%>").Send(`{<%for(var i=1,ll=data.length;i<ll;i++) {%><% if(data[i].valtype == "string") {%>"<%= data[i].key.toLowerCase()%>": "<%= data[i].key.toLowerCase()%>",<%} else {%><%= data[i].key.toLowerCase()%>": 0,<%}%><%}%>"1":"1"}`).End()
+		_, body, _ := request.Post(Url + "<%= url%>").Send(`{<%for(var i=1,ll=data.length;i<ll;i++) {%><% if(data[i].valtype == "string") {%>"<%= data[i].key.toLowerCase()%>": "<%= data[i].key.toLowerCase()%>",<%} else {%>"<%= data[i].key.toLowerCase()%>": 1,<%}%><%}%>"1":"1"}`).End()
 		var jsonEnt json<%= firstUpTableName%>Get
 		json.Unmarshal([]byte(body), &jsonEnt) //转换成struct
 		id = jsonEnt.Msg                       //赋值id
@@ -53,7 +53,7 @@ func Test<%= firstUpTableName%>Get(t *testing.T) {
 
 func Test<%= firstUpTableName%>Update(t *testing.T) {
 	Convey("更新<%= china%>", t, func() {
-		_, body, _ := request.Put(Url + "<%= url%>").Send({`"id":`+Tools.ParseString(id)+`,<%for(var i=1,ll=data.length;i<ll;i++) {%><% if(data[i].valtype == "string"){%>"<%= data[i].key.toLowerCase()%>": "<%= data[i].key.toLowerCase()%>",<%} else {%><%= data[i].key.toLowerCase()%>": 0,<%}%><%}%>"1":"1"}}`).End()
+		_, body, _ := request.Put(Url + "<%= url%>").Send(`{"id":`+Tools.ParseString(id)+`,<%for(var i=1,ll=data.length;i<ll;i++) {%><% if(data[i].valtype == "string"){%>"<%= data[i].key.toLowerCase()%>": "<%= data[i].key.toLowerCase()%>",<%} else {%>"<%= data[i].key.toLowerCase()%>": 1,<%}%><%}%>"1":"1"}`).End()
 		var jsonEnt json<%= firstUpTableName%>
 		json.Unmarshal([]byte(body), &jsonEnt)
 		So(jsonEnt.State, ShouldEqual, true)

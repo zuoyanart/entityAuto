@@ -117,10 +117,10 @@ func <%= firstUpTableName%>Page(ctx *neo.Ctx) (int, error) {
 * @apiPermission admin
  */
 func <%= firstUpTableName%>Dele(ctx *neo.Ctx) (int, error) {
-	ids := Tools.ParseInt(ctx.Req.Params.Get("id"), 0)
-	uid := Tools.ParseInt(ctx.Req.Params.Get("uid"), 0)
-	err1 := validate.Field(ids, "required, min=1")
-	err2 := validate.Field(uid, "required, min=1")
+	ids := Tools.ParseInt(ctx.Req.FormValue("id"), 0)
+	uid := Tools.ParseInt(ctx.Req.FormValue("uid"), 0)
+	err1 := validate.Field(ids, "required,min=1")
+	err2 := validate.Field(uid, "required,min=1")
 	if err1 != nil || err2 != nil{
 		return 200, ctx.Res.Json(errorValidate())
 	}
