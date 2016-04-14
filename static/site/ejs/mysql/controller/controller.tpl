@@ -94,7 +94,7 @@ func <%= firstUpTableName%>Page(ctx *neo.Ctx) (int, error) {
 	cp := Tools.ParseInt(ctx.Req.FormValue("cp"), 1)
 	mp := Tools.ParseInt(ctx.Req.FormValue("mp"), 20)
 	kw := ctx.Req.FormValue("kw")
-	err1 := validate.Field(kw, "required,min=1,max=20")
+	err1 := validate.Field(kw, "omitempty,min=1,max=20")
 	err2 := validate.Field(cp, "required,min=1")
 	err3 := validate.Field(mp, "required,min=1,max=50")
 	if err1 != nil || err2 != nil || err3 != nil {
