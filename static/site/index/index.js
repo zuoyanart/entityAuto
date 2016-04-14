@@ -276,6 +276,15 @@ var index = (function() {
         var s = ejs.compile(tplstr.toString())(json);
         var spath = generatePath + "\\" + fileDir[i] + "\\" + json.tablename.toLowerCase() + ".go";
         fs.outputFileSync(spath, s);
+
+        tplteststr = fs.readFileSync(appPath + "/site/ejs/" + db + "/" + fileDir[i] + "/" + fileDir[i] + "_test.tpl");
+        var stest = ejs.compile(tplteststr.toString())(json);
+
+        var spathtest = generatePath + "\\" + fileDir[i] + "\\" + json.tablename.toLowerCase() + "_test.go";
+        if(fileDir[i] == "controller") {
+            spathtest = generatePath + "\\restest\\" + json.tablename.toLowerCase() + "_test.go";
+        }
+        fs.outputFileSync(spathtest, stest);
       }
       pageHisList();
     }

@@ -16,7 +16,10 @@ func (u <%= firstUpTableName%>) TableName() string {
  */
 func <%= firstUpTableName%>Get(id int) ApiJson {
 	var <%= tablename.toLowerCase()%> <%= firstUpTableName%>
-	DB.First(&<%= tablename.toLowerCase()%>, id)
+	err := DB.First(&<%= tablename.toLowerCase()%>, id).Error
+	if err != nil {
+		return ApiJson{State: false, Msg: err.Error()}
+	}
 	return ApiJson{State: true, Msg:<%= tablename.toLowerCase()%>}
 }
 /**
