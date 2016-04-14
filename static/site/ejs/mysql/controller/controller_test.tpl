@@ -68,6 +68,16 @@ func Test<%= firstUpTableName%>Update(t *testing.T) {
 	})
 }
 
+func Test<%= firstUpTableName%>Page(t *testing.T) {
+	Convey("获取列表<%= china%>", t, func() {
+		_, body, _ := request.Post(Url + "<%= url%>/page").Send("cp=1&mp=10&kw=11").End()
+		var jsonEnt json<%= firstUpTableName%>List
+		json.Unmarshal([]byte(body), &jsonEnt)
+		So(jsonEnt.State, ShouldEqual, true)
+		So(jsonEnt.Count, ShouldNotEqual, 0)
+	})
+}
+
 func Test<%= firstUpTableName%>Dele(t *testing.T) {
 	Convey("删除<%= china%>", t, func() {
 		_, body, _ := request.Delete(Url + "<%= url%>").Query("id=" + Tools.ParseString(id)).End()
@@ -80,15 +90,5 @@ func Test<%= firstUpTableName%>Dele(t *testing.T) {
 			json.Unmarshal([]byte(body), &jsonEnt)
 			So(jsonEnt.State, ShouldEqual, false)
 		})
-	})
-}
-
-func Test<%= firstUpTableName%>Page(t *testing.T) {
-	Convey("获取列表<%= china%>", t, func() {
-		_, body, _ := request.Post(Url + "<%= url%>/page").Send("cp=1&mp=10&kw=11").End()
-		var jsonEnt json<%= firstUpTableName%>List
-		json.Unmarshal([]byte(body), &jsonEnt)
-		So(jsonEnt.State, ShouldEqual, true)
-		So(jsonEnt.Count, ShouldNotEqual, 0)
 	})
 }
