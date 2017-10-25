@@ -25,6 +25,7 @@ class <%= firstUpTableName%> extends Validate
         'read'    => ['id'],
         'index' =>['cp'=>'require|min:1','mp'=>'require|min:1'],
         'delete' =>['id'],
-        'save'=>[<%for(var i=0,ll=data.length;i<ll;i++) {%><%if(data[i].key.toLowerCase() != 'id'){%>'<%= data[i].key.toLowerCase()%>',<%}}%>]
+        'save'=>[<%for(var i=0,ll=data.length;i<ll;i++) {%><%if(data[i].key.toLowerCase() != 'id'){%>'<%= data[i].key.toLowerCase()%>',<%}}%>],
+        'update'=>[<%for(var i=0,ll=data.length;i<ll;i++) {%>'<%= data[i].key.toLowerCase()%>',<%}%>],
     ];
 }

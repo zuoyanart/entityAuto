@@ -51,7 +51,7 @@ class <%= firstUpTableName%> extends Base
   public function  update(<%= firstUpTableName%>Model $<%= tablename.toLowerCase()%>, $id=0)
   {
     $param = input('put.');
-    $check = $this->validate($param,'<%= firstUpTableName%>');
+    $check = $this->validate($param,'<%= firstUpTableName%>.update');
     if($check !== true) {
       return apiJson([], -1, $check);
     }
