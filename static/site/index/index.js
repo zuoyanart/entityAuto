@@ -1,4 +1,11 @@
 /**
+ * @Date:   2017-10-20T11:19:53+08:00
+ * @Last modified time: 2017-10-20T15:32:23+08:00
+ */
+
+
+
+/**
  * 首页相关操作
  * @return {[type]} [description]
  */
@@ -104,7 +111,7 @@ var index = (function() {
                             item.key = result[j].name;
                             item.valtype = result[j].type.replace("varchar","string").replace("char","string");
                             if (item.key == "id") {
-                              item.validate = "omitempty,min=1";
+                              item.validate = "require|number";
                               item.json = 'json:"id" gorm:"primary_key;AUTO_INCREMENT" validate:"omitempty,min=1"';
                                 item.note = "主键id";
                             } else {
@@ -246,14 +253,16 @@ var index = (function() {
     console.log(db);
     console.log(json);
     if (json) {
-      var fileDir = ["controller", "model"];
+      var fileDir = ["controller", "model", 'validate'];
       var tplstr = '';
       var generatePath = $.trim($("#file").val()); //生成文件的根目录
       json.rootpath = generatePath.split("\\").pop();
       json.url = $.trim($("#" + db + "-url").val());
       json.reltablename = $.trim($("#" + db + "-tablename").val());
       if(json.reltablename.indexOf("_") > -1) {
-          json.tablename = json.reltablename.split("_")[1].toLowerCase().replace(/^\S/,function(s){return s.toUpperCase();});
+          var nameArray = json.reltablename.split('_');
+          nameArray.shift();
+          json.tablename = nameArray.join("").toLowerCase().replace(/^\S/,function(s){return s.toUpperCase();});
       } else {
         json.tablename = json.reltablename;
       }
@@ -274,17 +283,17 @@ var index = (function() {
       for (var i = 0, ll = fileDir.length; i < ll; i++) {
         tplstr = fs.readFileSync(appPath + "/site/ejs/" + db + "/" + fileDir[i] + "/" + fileDir[i] + ".tpl");
         var s = ejs.compile(tplstr.toString())(json);
-        var spath = generatePath + "\\" + fileDir[i] + "\\" + json.tablename.toLowerCase() + ".go";
+        var spath = generatePath + "\\" + fileDir[i] + "\\" + json.firstUpTableName + ".php";
         fs.outputFileSync(spath, s);
 
-        tplteststr = fs.readFileSync(appPath + "/site/ejs/" + db + "/" + fileDir[i] + "/" + fileDir[i] + "_test.tpl");
-        var stest = ejs.compile(tplteststr.toString())(json);
+        // tplteststr = fs.readFileSync(appPath + "/site/ejs/" + db + "/" + fileDir[i] + "/" + fileDir[i] + "_test.tpl");
+        // var stest = ejs.compile(tplteststr.toString())(json);
 
-        var spathtest = generatePath + "\\" + fileDir[i] + "\\" + json.tablename.toLowerCase() + "_test.go";
-        if(fileDir[i] == "controller") {
-            spathtest = generatePath + "\\restest\\" + json.tablename.toLowerCase() + "_test.go";
-        }
-        fs.outputFileSync(spathtest, stest);
+        // var spathtest = generatePath + "\\" + fileDir[i] + "\\" + json.tablename.toLowerCase() + "_test.go";
+        // if(fileDir[i] == "controller") {
+        //     spathtest = generatePath + "\\restest\\" + json.tablename.toLowerCase() + "_test.go";
+        // }
+        // fs.outputFileSync(spathtest, stest);
       }
       pageHisList();
     }
@@ -388,10 +397,10 @@ var index = (function() {
 
     if (column.type.indexOf("char") > -1) {
       data.json = 'json:"' + column.name + '" sql:"type:' + column.type + '(' + column.charlen + ');default:\'' + column.def + '\'" validate:"omitempty,min=1,max=' + (parseInt(column.charlen) * 2) + ','+getRegValite(column.name)+'"';
-      data.validate = 'omitempty,min=1,max=' + (parseInt(column.charlen) * 2) +"," + getRegValite(column.name);
+      data.validate = 'require|min:1|max:' + (parseInt(column.charlen) * 2);
     } else if(column.type == "int") {
         data.json = 'json:"' + column.name + '" sql:"default:' + column.def + '" validate:"omitempty,min=1,'+getRegValite(column.name)+'"';
-        data.validate = 'omitempty,min=1,' + getRegValite(column.name);
+        data.validate = 'require|number|min:1';
     }
     return data;
   }
