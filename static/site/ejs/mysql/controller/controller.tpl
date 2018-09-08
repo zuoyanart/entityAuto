@@ -1,17 +1,20 @@
-<?php
 /**
- * User:
- * mail:
- * Date:
- * Des:
- * Generate: entityAuto@huabinglan@163.com
+ * @Author: 左盐
+ * @Date:   2018-05-07 23:05:40
+ * @Email:  huabinglan@163.com
+ * @Project: xxx
+ * @Last modified by:   左盐
+ * @Last modified time: 2018-05-12 17:07:54
  */
 
-namespace app\<%= rootpath%>\controller;
-use app\<%= rootpath%>\model\<%= firstUpTableName%> as <%= firstUpTableName%>Model;
+const Base = require('./base.js');
 
-class <%= firstUpTableName%> extends Base
-{
+module.exports = class extends Base {
+  constructor(ctx) {
+    super(ctx);
+    this.<%= tablename.toLowerCase()%>S = this.service('<%= tablename.toLowerCase()%>');
+    this.<%= tablename.toLowerCase()%>M = this.model('<%= tablename.toLowerCase()%>');
+  }
   /**
    * @api {get} /<%= url%>/:id 获取<%= china%>
    * @apiName get <%= tablename.toLowerCase()%>
@@ -21,18 +24,14 @@ class <%= firstUpTableName%> extends Base
    * @apiSampleRequest /<%= url%>/:id
    * @apiParam {int} id<%= china%>的id
    * @apiSuccess {json} data 数据
-   * @apiSuccess {int} code 0成功，其他为错误码
+   * @apiSuccess {int} code 200成功，其他为错误码
    * @apiSuccess {string} message 错误信息<%for(var i=0,ll=data.length; i<ll;i++) {%>
    * @apiSuccess {<%= data[i].valtype%>} --<%= data[i].key%> <%= data[i].note%>(<%= data[i].validate%>)<%}%>
    */
-  public function  read( <%= firstUpTableName%>Model $<%= tablename.toLowerCase()%>, $id=0)
-  {
-      $check = $this->validate($id,'<%= firstUpTableName%>.read');
-      if($check !== true) {
-        return apiJson([], -1, $check);
-      }
-      $json = $<%= tablename.toLowerCase()%>->read($id);
-      return apiJson($json);
+  async getAction() {
+        let param = tools.xss(this.post());
+        let doc = await this.<%= tablename.toLowerCase()%>M.get(param.id);
+        return this.jsonOk(doc);
   }
 
   /**
@@ -48,17 +47,18 @@ class <%= firstUpTableName%> extends Base
   * @apiSuccess {string} message 错误信息
   * @apiPermission admin
    */
-  public function  update(<%= firstUpTableName%>Model $<%= tablename.toLowerCase()%>, $id=0)
-  {
-    $param = input('put.');
-    $check = $this->validate($param,'<%= firstUpTableName%>.update');
-    if($check !== true) {
-      return apiJson([], -1, $check);
+ async editNameAction() {
+    const param = tools.xss(this.post());
+    const uid = this.cookie('id');
+    const doc = await this.this.<%= tablename.toLowerCase()%>M.edit(param.id, uid, {
+      name: param.name
+    });
+    if(doc === 1) {
+      return this.jsonOk(doc);
+    } else {
+      return this.jsonFail();
     }
-    $json =  $<%= tablename.toLowerCase()%>->editData($param, $id);
-    return apiJson($json);
   }
-
   /**
   * @api {post} /<%= url%> 创建<%= china%>
   * @apiName create <%= tablename.toLowerCase()%>
@@ -72,15 +72,17 @@ class <%= firstUpTableName%> extends Base
   * @apiSuccess {string} message 错误信息
   * @apiPermission admin
    */
-  public function  save(<%= firstUpTableName%>Model $<%= tablename.toLowerCase()%>)
-  {
-    $param = input('post.');
-    $check = $this->validate($param,'<%= firstUpTableName%>.save');
-    if($check !== true) {
-      return apiJson([], -1, $check);
-    }
-      $data = $<%= tablename.toLowerCase()%>->saveData($param);
-      return apiJson($data);
+ async createAction() {
+    const param = tools.xss(this.post());
+    const uid = this.cookie('id');
+    param['uid'] = uid;
+    const doc = await this.<%= tablename.toLowerCase()%>M.create(param).catch(err => {
+      return think.isError(err) ? err : new Error(err);
+    });
+    if (think.isError(doc)) {
+      return this.jsonFail(doc);
+    };
+    return this.jsonOk(doc);
   }
 
   /**
@@ -98,15 +100,15 @@ class <%= firstUpTableName%> extends Base
   * @apiSuccess {string} message 错误信息
   * @apiPermission admin
    */
-  public function  index(<%= firstUpTableName%>Model $<%= tablename.toLowerCase()%>)
-  {
-      $param = input('get.');
-      $check = $this->validate($param,'<%= firstUpTableName%>.index');
-      if($check !== true) {
-        return apiJson([], -1, $check);
-      }
-      $json =  $<%= tablename.toLowerCase()%>->page($param['kw'],  $param['cp'], $param['mp']);
-      return apiJson($json);
+  async pageAction() {
+      let param = tools.xss(this.post());
+      let doc = await this.<%= tablename.toLowerCase()%>M.page(param.name, this.cookie('id'), param.cp, param.mp).catch(err => {
+      return think.isError(err) ? err : new Error(err);
+    });
+    if (think.isError(doc)) {
+      return this.jsonFail(doc);
+    };
+    return this.jsonOk(doc);
   }
 
   /**
@@ -123,14 +125,15 @@ class <%= firstUpTableName%> extends Base
   * @apiSuccess {string} message 错误信息
   * @apiPermission admin
    */
-  public function  delete(<%= firstUpTableName%>Model $<%= tablename.toLowerCase()%>, $id=0)
-  {
-    $check = $this->validate($id,'<%= firstUpTableName%>.delete');
-    if($check !== true) {
-      return apiJson([], -1, $check);
-    }
-    $json =  $<%= tablename.toLowerCase()%>->remove($id);
-    return apiJson($json);
+  async delAction() {
+    const param = tools.xss(this.post());
+    const number = await this.<%= tablename.toLowerCase()%>M.del(param.id, this.cookie('id')).catch(err => {
+      return think.isError(err) ? err : new Error(err);
+    });
+    if (think.isError(doc)) {
+      return this.jsonFail(doc);
+    };
+    return this.jsonOk();
   }
 
 }

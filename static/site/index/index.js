@@ -9,7 +9,7 @@
  * 首页相关操作
  * @return {[type]} [description]
  */
-var index = (function() {
+var index = (function () {
   var self = {};
   var fs = require('fs-extra');
   var ejs = require("ejs");
@@ -21,130 +21,130 @@ var index = (function() {
    * 页面初始化
    * @return {[type]} [description]
    */
-  self.init = function() {
-      pageHisList("mysql");
-      pageHisList("mongodb");
-      $("#dbtype").pizzaSelect({ //模拟下拉
-        onChange: function(obj) {
-          var val = obj.attr("data");
-          switch (val) {
-            case "mysql":
-              $(".mysql").css("display", "block");
-              $(".mongodb").css("display", "none");
-              break;
-            case "mongodb":
-              $(".mysql").css("display", "none");
-              $(".mongodb").css("display", "block");
-              break;
-            default:
+  self.init = function () {
+    pageHisList("mysql");
+    pageHisList("mongodb");
+    $("#dbtype").pizzaSelect({ //模拟下拉
+      onChange: function (obj) {
+        var val = obj.attr("data");
+        switch (val) {
+          case "mysql":
+            $(".mysql").css("display", "block");
+            $(".mongodb").css("display", "none");
+            break;
+          case "mongodb":
+            $(".mysql").css("display", "none");
+            $(".mongodb").css("display", "block");
+            break;
+          default:
 
-          }
         }
-      });
-
-
-      $(".file").change(function() { //点击选择文件目录
-        var val = $(this).val();
-        if (val != '') {
-          $("#file").val(val);
-        }
-      });
-
-      $("tfoot").find(".addrow").click(function() { //添加行
-        addRow($(this));
-      });
-      $("tfoot").find(".generate").click(function() { //生成文件
-        generateFile();
-      });
-      $("tbody").on("click", ".delrow", function() { //删除行
-        delRow($(this));
-      });
-
-      $("tbody").on("blur", ".key,.validate", function() {
-        keyBlur($(this));
-      });
-
-      $("#mysqllogin").on("click", function() {
-        layer.load(1);
-        mysqlQuery("show databases", [], function(err, result) {
-          layer.closeAll();
-          resetPizzaSelect($("#choosedb"), "choosedb");
-          var s = '<option value="" selected="selected">请选择数据库</option>';
-          for (var i = 0, ll = result.length; i < ll; i++) {
-            s += '<option value="' + result[i].Database + '">' + result[i].Database + '</option>';
-          }
-          $("#choosedb").html(s);
-          $("#choosedb").pizzaSelect({
-            onChange: function(obj) {
-              var val = obj.attr("data");
-              if (val != "") {
-                layer.load(1);
-                mysqlQuery("SELECT TABLE_NAME,TABLE_ROWS FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='" + val + "';", [], function(err, tablename) {
-                  layer.closeAll();
-                  resetPizzaSelect($("#mysql-tablename"), "mysql-tablename");
-                  var ss = '<option value="" selected="selected">请选择表</option>';
-                  console.log(tablename);
-                  for (var i = 0, ll = tablename.length; i < ll; i++) {
-                    ss += '<option value="' + tablename[i].TABLE_NAME + '">' + tablename[i].TABLE_NAME + '</option>';
-                  }
-                  $("#mysql-tablename").html(ss);
-                  $("#mysql-tablename").pizzaSelect({
-                    onChange: function(obj) {
-                      var val = obj.attr("data");
-                      if (val != "") {
-                        layer.load(1);
-                        mysqlQuery("select  column_name as name, data_type as type, COLUMN_default as def, is_nullable as  nullable,character_maximum_length as charlen,column_comment as brief from Information_schema.columns  where table_Name = '"+val+"' and table_schema='"+  $("#choosedb").val()+"';", function(err, result) {
-                          layer.closeAll();
-                          var json = {};
-                          var data = [];
-                          var item = {};
-                          var columnAttr = {};
-                          json.china = '';
-                          json.rootpath = "";
-                          json.tablename = "";
-                          json.url = "";
-                          console.log(result);
-                          console.log(result.length);
-                          for (var j = 0, jj = result.length; j < jj; j++) {
-                            item = {};
-                            columnAttr = getJsonBySql(result[j]);
-                            item.key = result[j].name;
-                            item.valtype = result[j].type.replace("varchar","string").replace("char","string");
-                            if (item.key == "id") {
-                              item.validate = "require|number|min:1";
-                              item.json = 'json:"id" gorm:"primary_key;AUTO_INCREMENT" validate:"omitempty,min=1"';
-                                item.note = "主键id";
-                            } else {
-                              item.json = columnAttr.json;
-                              item.validate = columnAttr.validate;
-                              item.note = result[j].brief;
-                            }
-                            data.push(item);
-                          }
-                          json.data = data;
-                          console.log(json);
-                          addRow($('.mysqladdrow'), json);
-                        });
-                      }
-                    }
-                  });
-
-                });
-              }
-            }
-          });
-        })
-      });
-
-      for (var i = 0; i < 5; i++) { //初始化5条数据
-        $("tfoot").find(".addrow").click();
       }
+    });
+
+
+    $(".file").change(function () { //点击选择文件目录
+      var val = $(this).val();
+      if (val != '') {
+        $("#file").val(val);
+      }
+    });
+
+    $("tfoot").find(".addrow").click(function () { //添加行
+      addRow($(this));
+    });
+    $("tfoot").find(".generate").click(function () { //生成文件
+      generateFile();
+    });
+    $("tbody").on("click", ".delrow", function () { //删除行
+      delRow($(this));
+    });
+
+    $("tbody").on("blur", ".key,.validate", function () {
+      keyBlur($(this));
+    });
+
+    $("#mysqllogin").on("click", function () {
+      layer.load(1);
+      mysqlQuery("show databases", [], function (err, result) {
+        layer.closeAll();
+        resetPizzaSelect($("#choosedb"), "choosedb");
+        var s = '<option value="" selected="selected">请选择数据库</option>';
+        for (var i = 0, ll = result.length; i < ll; i++) {
+          s += '<option value="' + result[i].Database + '">' + result[i].Database + '</option>';
+        }
+        $("#choosedb").html(s);
+        $("#choosedb").pizzaSelect({
+          onChange: function (obj) {
+            var val = obj.attr("data");
+            if (val != "") {
+              layer.load(1);
+              mysqlQuery("SELECT TABLE_NAME,TABLE_ROWS FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='" + val + "';", [], function (err, tablename) {
+                layer.closeAll();
+                resetPizzaSelect($("#mysql-tablename"), "mysql-tablename");
+                var ss = '<option value="" selected="selected">请选择表</option>';
+                console.log(tablename);
+                for (var i = 0, ll = tablename.length; i < ll; i++) {
+                  ss += '<option value="' + tablename[i].TABLE_NAME + '">' + tablename[i].TABLE_NAME + '</option>';
+                }
+                $("#mysql-tablename").html(ss);
+                $("#mysql-tablename").pizzaSelect({
+                  onChange: function (obj) {
+                    var val = obj.attr("data");
+                    if (val != "") {
+                      layer.load(1);
+                      mysqlQuery("select  column_name as name, data_type as type, COLUMN_default as def, is_nullable as  nullable,character_maximum_length as charlen,column_comment as brief from Information_schema.columns  where table_Name = '" + val + "' and table_schema='" + $("#choosedb").val() + "';", function (err, result) {
+                        layer.closeAll();
+                        var json = {};
+                        var data = [];
+                        var item = {};
+                        var columnAttr = {};
+                        json.china = '';
+                        json.rootpath = "";
+                        json.tablename = "";
+                        json.url = "";
+                        console.log(result);
+                        console.log(result.length);
+                        for (var j = 0, jj = result.length; j < jj; j++) {
+                          item = {};
+                          columnAttr = getJsonBySql(result[j]);
+                          item.key = result[j].name;
+                          item.valtype = result[j].type.replace("varchar", "string").replace("char", "string");
+                          if (item.key == "id") {
+                            item.validate = `{reruired: true}`; //"require|number|min:1";
+                            item.json = '';
+                            item.note = "主键id";
+                          } else {
+                            item.json = columnAttr.json;
+                            item.validate = columnAttr.validate;
+                            item.note = result[j].brief;
+                          }
+                          data.push(item);
+                        }
+                        json.data = data;
+                        console.log(json);
+                        addRow($('.mysqladdrow'), json);
+                      });
+                    }
+                  }
+                });
+
+              });
+            }
+          }
+        });
+      })
+    });
+
+    for (var i = 0; i < 5; i++) { //初始化5条数据
+      $("tfoot").find(".addrow").click();
     }
-    /**
-     * 添加行
-     * @method addRow
-     * @param  {[type]} obj [description]
-     */
+  }
+  /**
+   * 添加行
+   * @method addRow
+   * @param  {[type]} obj [description]
+   */
   function addRow(obj, data) {
     var tpl = __inline("index.ejs");
     if (!data) {
@@ -221,7 +221,7 @@ var index = (function() {
     s += '<option value="all">清除历史记录</option>';
     obj.html(s);
     obj.pizzaSelect({
-      onChange: function(obj) {
+      onChange: function (obj) {
         var his = obj.attr("data");
         var db = getDBType();
         if (his == "30day" || his == "all") {
@@ -253,22 +253,26 @@ var index = (function() {
     console.log(db);
     console.log(json);
     if (json) {
-      var fileDir = ["controller", "model", 'validate'];
+      var fileDir = ["controller", "model", 'logic'];
       var tplstr = '';
       var generatePath = $.trim($("#file").val()); //生成文件的根目录
       json.rootpath = generatePath.split("\\").pop();
       json.url = $.trim($("#" + db + "-url").val());
       json.reltablename = $.trim($("#" + db + "-tablename").val());
-      if(json.reltablename.indexOf("_") > -1) {
-          var nameArray = json.reltablename.split('_');
-          nameArray.shift();
-          json.tablename = nameArray.join("").toLowerCase().replace(/^\S/,function(s){return s.toUpperCase();});
+      if (json.reltablename.indexOf("_") > -1) {
+        var nameArray = json.reltablename.split('_');
+        nameArray.shift();
+        json.tablename = nameArray.join("").toLowerCase().replace(/^\S/, function (s) {
+          return s.toUpperCase();
+        });
       } else {
         json.tablename = json.reltablename;
       }
 
       json.china = $.trim($("#" + db + "-china").val());
-      json.firstUpTableName = json.tablename.replace(/^\S/,function(s){return s.toUpperCase();})
+      json.firstUpTableName = json.tablename.replace(/^\S/, function (s) {
+        return s.toUpperCase();
+      })
       // json.firstUpTableName = json.tablename.toLowerCase().replace(/^\S/, function(s) {
       // return s.toUpperCase();
       // });
@@ -283,7 +287,7 @@ var index = (function() {
       for (var i = 0, ll = fileDir.length; i < ll; i++) {
         tplstr = fs.readFileSync(appPath + "/site/ejs/" + db + "/" + fileDir[i] + "/" + fileDir[i] + ".tpl");
         var s = ejs.compile(tplstr.toString())(json);
-        var spath = generatePath + "\\" + fileDir[i] + "\\" + json.firstUpTableName + ".php";
+        var spath = generatePath + "\\" + fileDir[i] + "\\" + json.firstUpTableName.toLowerCase() + ".js";
         fs.outputFileSync(spath, s);
 
         // tplteststr = fs.readFileSync(appPath + "/site/ejs/" + db + "/" + fileDir[i] + "/" + fileDir[i] + "_test.tpl");
@@ -317,7 +321,7 @@ var index = (function() {
     var data = [];
     var item = {};
     var tds;
-    $("." + dbtype + "key > tr").each(function(i, o) {
+    $("." + dbtype + "key > tr").each(function (i, o) {
       item = {};
       tds = $(o).find("td");
 
@@ -364,7 +368,7 @@ var index = (function() {
       password: $.trim($("#mysqlpwd").val()),
       port: $.trim($("#mysqlport").val())
     });
-    pool.getConnection(function(err, conn) { //创建一个连接
+    pool.getConnection(function (err, conn) { //创建一个连接
       if (err) {
         alert(err);
         return;
@@ -380,8 +384,8 @@ var index = (function() {
    * @return {[type]}         [description]
    */
   function mysqlQuery(sql, param, cb) {
-    mysqlLogin(function(conn) {
-      conn.query(sql, param, function(err, result) {
+    mysqlLogin(function (conn) {
+      conn.query(sql, param, function (err, result) {
         cb(err, result);
       });
     });
@@ -396,11 +400,11 @@ var index = (function() {
     var data = {};
 
     if (column.type.indexOf("char") > -1) {
-      data.json = 'json:"' + column.name + '" sql:"type:' + column.type + '(' + column.charlen + ');default:\'' + column.def + '\'" validate:"omitempty,min=1,max=' + (parseInt(column.charlen) * 2) + ','+getRegValite(column.name)+'"';
-      data.validate = 'require|min:1|max:' + (parseInt(column.charlen) * 2);
-    } else if(column.type == "int") {
-        data.json = 'json:"' + column.name + '" sql:"default:' + column.def + '" validate:"omitempty,min=1,'+getRegValite(column.name)+'"';
-        data.validate = 'require|number|min:1';
+      data.json = 'json:"' + column.name + '" sql:"type:' + column.type + '(' + column.charlen + ');default:\'' + column.def + '\'" validate:"omitempty,min=1,max=' + (parseInt(column.charlen) * 2) + ',' + getRegValite(column.name) + '"';
+      data.validate = '{required: true,string: true,length: { min: 1,max: ' + (parseInt(column.charlen)) * 2 + '}}';
+    } else if (column.type == "int" || column.type == "tinyint") {
+      data.json = 'json:"' + column.name + '" sql:"default:' + column.def + '" validate:"omitempty,min=1,' + getRegValite(column.name) + '"';
+      data.validate = '{required: true,int: {min: 1,}}';
     }
     return data;
   }
@@ -411,11 +415,11 @@ var index = (function() {
    * @return {[type]}          [description]
    */
   function getRegValite(name) {
-    if(name.indexOf("mail") > -1) {
+    if (name.indexOf("mail") > -1) {
       return "email";
-    } else if(name.indexOf("url") > -1 || name.indexOf("link") > -1) {
+    } else if (name.indexOf("url") > -1 || name.indexOf("link") > -1) {
       return "url";
-    } else if(name == "ip") {
+    } else if (name == "ip") {
       return "ip";
     }
     return "";
