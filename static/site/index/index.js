@@ -111,7 +111,7 @@ var index = (function() {
                             item.key = result[j].name;
                             item.valtype = result[j].type.replace("varchar","string").replace("char","string");
                             if (item.key == "id") {
-                              item.validate = "require|number";
+                              item.validate = "require|number|min:1";
                               item.json = 'json:"id" gorm:"primary_key;AUTO_INCREMENT" validate:"omitempty,min=1"';
                                 item.note = "主键id";
                             } else {

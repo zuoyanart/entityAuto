@@ -79,7 +79,7 @@ class <%= firstUpTableName%> extends Base
     if($check !== true) {
       return apiJson([], -1, $check);
     }
-      $data = $<%= tablename.toLowerCase()%>->saveData();
+      $data = $<%= tablename.toLowerCase()%>->saveData($param);
       return apiJson($data);
   }
 
