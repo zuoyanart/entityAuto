@@ -10,6 +10,9 @@
  * 数据源
  */
 module.exports = class extends think.Model {
+   get tableName() {
+    return this.config.prefix + '<%=reltablename%>';
+  }
   /**
    * 获取列表
    * @param  {[type]}  kw [description]
@@ -17,9 +20,9 @@ module.exports = class extends think.Model {
    * @param  {[type]}  mp [description]
    * @return {Promise}    [description]
    */
-  async page(uid, cp = 1, mp = 30) {
+  async page(ownerid, cp = 1, mp = 30) {
     const where = {
-      uid: uid
+      ownerid: ownerid
     };
     const rows = await this.where(where)
       .field('id,name')
@@ -47,10 +50,10 @@ module.exports = class extends think.Model {
    * @param  {[type]} nodeid [description]
    * @return {[type]}        [description]
    */
-  async get(id, uid) {
+  async get(id, ownerid) {
     const row = await this.where({
       id: id,
-      uid: uid
+      ownerid: ownerid
     }).find();
     return row;
   }
@@ -59,9 +62,10 @@ module.exports = class extends think.Model {
    * @param  {[type]}  json [description]
    * @return {Promise}      [description]
    */
-  async edit(uid, json) {
+  async edit(id, ownerid, json) {
     const row = await this.where({
-      uid
+      id,
+      ownerid
     }).update(json);
     return row;
   }
@@ -70,10 +74,10 @@ module.exports = class extends think.Model {
    * @param  {[type]}  id [description]
    * @return {Promise}    [description]
    */
-  async del(id, uid) {
+  async del(id, ownerid) {
     const row = await this.where({
       id: id,
-      uid: uid
+      ownerid: ownerid
     }).delete();
     return row;
   }

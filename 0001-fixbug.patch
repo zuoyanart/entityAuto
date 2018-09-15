@@ -1,0 +1,39 @@
+From ff45546480809da689124cdfbc0035cdc1b8ada7 Mon Sep 17 00:00:00 2001
+From: "huabinglan@163.com" <huabinglan@163.com>
+Date: Sat, 8 Sep 2018 16:32:23 +0800
+Subject: [PATCH 1/2] fixbug
+
+---
+ static/site/ejs/mysql/controller/controller.tpl | 2 +-
+ static/site/index/index.js                      | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/static/site/ejs/mysql/controller/controller.tpl b/static/site/ejs/mysql/controller/controller.tpl
+index 60a5fad..5e55816 100644
+--- a/static/site/ejs/mysql/controller/controller.tpl
++++ b/static/site/ejs/mysql/controller/controller.tpl
+@@ -79,7 +79,7 @@ class <%= firstUpTableName%> extends Base
+     if($check !== true) {
+       return apiJson([], -1, $check);
+     }
+-      $data = $<%= tablename.toLowerCase()%>->saveData();
++      $data = $<%= tablename.toLowerCase()%>->saveData($param);
+       return apiJson($data);
+   }
+ 
+diff --git a/static/site/index/index.js b/static/site/index/index.js
+index 15e2f8f..a65e1c6 100644
+--- a/static/site/index/index.js
++++ b/static/site/index/index.js
+@@ -111,7 +111,7 @@ var index = (function() {
+                             item.key = result[j].name;
+                             item.valtype = result[j].type.replace("varchar","string").replace("char","string");
+                             if (item.key == "id") {
+-                              item.validate = "require|number";
++                              item.validate = "require|number|min:1";
+                               item.json = 'json:"id" gorm:"primary_key;AUTO_INCREMENT" validate:"omitempty,min=1"';
+                                 item.note = "主键id";
+                             } else {
+-- 
+2.18.0.windows.1
+

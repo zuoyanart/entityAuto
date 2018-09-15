@@ -250,8 +250,6 @@ var index = (function () {
   function generateFile() {
     var db = getDBType();
     var json = getKeyValue(db);
-    console.log(db);
-    console.log(json);
     if (json) {
       var fileDir = ["controller", "model", 'logic'];
       var tplstr = '';
@@ -262,6 +260,7 @@ var index = (function () {
       if (json.reltablename.indexOf("_") > -1) {
         var nameArray = json.reltablename.split('_');
         nameArray.shift();
+        json.reltablename = nameArray.join('_');
         json.tablename = nameArray.join("").toLowerCase().replace(/^\S/, function (s) {
           return s.toUpperCase();
         });
@@ -270,9 +269,7 @@ var index = (function () {
       }
 
       json.china = $.trim($("#" + db + "-china").val());
-      json.firstUpTableName = json.tablename.replace(/^\S/, function (s) {
-        return s.toUpperCase();
-      })
+      json.firstUpTableName = transformStr3(json.reltablename);
       // json.firstUpTableName = json.tablename.toLowerCase().replace(/^\S/, function(s) {
       // return s.toUpperCase();
       // });
@@ -287,20 +284,23 @@ var index = (function () {
       for (var i = 0, ll = fileDir.length; i < ll; i++) {
         tplstr = fs.readFileSync(appPath + "/site/ejs/" + db + "/" + fileDir[i] + "/" + fileDir[i] + ".tpl");
         var s = ejs.compile(tplstr.toString())(json);
-        var spath = generatePath + "\\" + fileDir[i] + "\\" + json.firstUpTableName.toLowerCase() + ".js";
+        var spath = generatePath + "\\" + fileDir[i] + "\\" + json.firstUpTableName + ".js";
         fs.outputFileSync(spath, s);
-
-        // tplteststr = fs.readFileSync(appPath + "/site/ejs/" + db + "/" + fileDir[i] + "/" + fileDir[i] + "_test.tpl");
-        // var stest = ejs.compile(tplteststr.toString())(json);
-
-        // var spathtest = generatePath + "\\" + fileDir[i] + "\\" + json.tablename.toLowerCase() + "_test.go";
-        // if(fileDir[i] == "controller") {
-        //     spathtest = generatePath + "\\restest\\" + json.tablename.toLowerCase() + "_test.go";
-        // }
-        // fs.outputFileSync(spathtest, stest);
       }
       pageHisList();
     }
+  }
+  /**
+   *  _转换为大驼峰
+   * @param {*} str 
+   */
+  function transformStr3(str) {
+    var a = str.split('_');
+    str = str.substring(a[0].length + 1, str.length);
+    var re = /_(\w)/g;
+    return str.replace(re, function ($0, $1) {
+      return $1.toUpperCase();
+    });
   }
   /**
    * 获取数据库类型
@@ -402,7 +402,7 @@ var index = (function () {
     if (column.type.indexOf("char") > -1) {
       data.json = 'json:"' + column.name + '" sql:"type:' + column.type + '(' + column.charlen + ');default:\'' + column.def + '\'" validate:"omitempty,min=1,max=' + (parseInt(column.charlen) * 2) + ',' + getRegValite(column.name) + '"';
       data.validate = '{required: true,string: true,length: { min: 1,max: ' + (parseInt(column.charlen)) * 2 + '}}';
-    } else if (column.type == "int" || column.type == "tinyint") {
+    } else if (column.type == "int" || column.type == "tinyint" || column.type == 'decimal') {
       data.json = 'json:"' + column.name + '" sql:"default:' + column.def + '" validate:"omitempty,min=1,' + getRegValite(column.name) + '"';
       data.validate = '{required: true,int: {min: 1,}}';
     }

@@ -1,60 +1,60 @@
-<% var dataType = ["bson.ObjectId","string","int","[]string","[]int","int32","int64"];%>
-  <% if(data.length == 0) {%>
-    <tr>
-      <td>
-        <input type="text" class="key" placeholder="全小写字母">
-      </td>
-      <td>
-        <select class="select1" style="120px">
-          <% for(var j=0,jj=dataType.length; j<jj;j++) {%>
-            <option value="<%= dataType[j]%>">
-              <%= dataType[j]%>
-            </option>
-            <%}%>
-        </select>
-      </td>
-      <td>
-        <input type="text" value="" placeholder="omitempty|required,max=100" class="validate">
-      </td>
-      <td>
-        <input type="text" value='json:""' class="json">
-      </td>
-      <td>
-        <input type="text">
-      </td>
-      <td><a href="#" class="btn btn-info delrow">删除</a></td>
-    </tr>
-    <%} else {%>
-      <% for(var i=0,ll=data.length;i<ll;i++) { %>
-        <tr>
-          <td>
-            <input type="text" class="key" placeholder="全小写字母" value='<%- data[i].key%>'>
-          </td>
-          <td>
-            <select class="select1" style="120px" value="int">
-              <% for(var j=0,jj=dataType.length; j<jj;j++) {%>
-                <% if(data[i].valtype == dataType[j]) {%>
-                  <option value="<%= dataType[j]%>" selected="selected">
-                    <%= dataType[j]%>
-                  </option>
-                  <%} else {%>
-                    <option value="<%= dataType[j]%>">
-                      <%= dataType[j]%>
-                    </option>
-                    <%}%>
-              <%}%>
-            </select>
-          </td>
-          <td>
-            <input type="text" placeholder="omitempty|required,max=100" class="validate" value='<%- data[i].validate%>'>
-          </td>
-          <td>
-            <input type="text" class="json" value='<%- data[i].json%>'>
-          </td>
-          <td>
-            <input type="text" value='<%- data[i].note%>'>
-          </td>
-          <td><a href="#" class="btn btn-info delrow">删除</a></td>
-        </tr>
-        <%}%>
-          <%}%>
+<% var dataType = ["bson.ObjectId","string","int","[]string","[]int","int32","int64","decimal", "tinyint"];%>
+<% if(data.length == 0) {%>
+<tr>
+  <td>
+    <input type="text" class="key" placeholder="全小写字母">
+  </td>
+  <td>
+    <select class="select1" style="120px">
+      <% for(var j=0,jj=dataType.length; j<jj;j++) {%>
+      <option value="<%= dataType[j]%>">
+        <%= dataType[j]%>
+      </option>
+      <%}%>
+    </select>
+  </td>
+  <td>
+    <input type="text" value="" placeholder="omitempty|required,max=100" class="validate">
+  </td>
+  <td>
+    <input type="text" value='json:""' class="json">
+  </td>
+  <td>
+    <input type="text">
+  </td>
+  <td><a href="#" class="btn btn-info delrow">删除</a></td>
+</tr>
+<%} else {%>
+<% for(var i=0,ll=data.length;i<ll;i++) { %>
+<tr>
+  <td>
+    <input type="text" class="key" placeholder="全小写字母" value='<%- data[i].key%>'>
+  </td>
+  <td>
+    <select class="select1" style="120px" value="int">
+      <% for(var j=0,jj=dataType.length; j<jj;j++) {%>
+      <% if(data[i].valtype == dataType[j]) {%>
+      <option value="<%= dataType[j]%>" selected="selected">
+        <%= dataType[j]%>
+      </option>
+      <%} else {%>
+      <option value="<%= dataType[j]%>">
+        <%= dataType[j]%>
+      </option>
+      <%}%>
+      <%}%>
+    </select>
+  </td>
+  <td>
+    <input type="text" placeholder="omitempty|required,max=100" class="validate" value='<%- data[i].validate%>'>
+  </td>
+  <td>
+    <input type="text" class="json" value='<%- data[i].json%>'>
+  </td>
+  <td>
+    <input type="text" value='<%- data[i].note%>'>
+  </td>
+  <td><a href="#" class="btn btn-info delrow">删除</a></td>
+</tr>
+<%}%>
+<%}%>

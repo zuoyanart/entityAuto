@@ -9,8 +9,9 @@ module.exports = class extends think.Logic {
     this.rules = {
       id: {
         required: true,
-        int: true,
-        min:1
+        int: {
+          min:1
+        }
       },
     }
   }
@@ -19,7 +20,9 @@ module.exports = class extends think.Logic {
     this.rules = {
       id: {
         required: true,
-        int: true,
+        int: {
+          min: 1
+        },
       },
       name: {
         required: true,
@@ -43,11 +46,16 @@ pageAction() {
     this.rules = {
       cp: {
         required: true,
-        int: true,
+        int: {
+          min:1
+        },
       },
       mp:{
         required: true,
-        int: true,
+        int: {
+          min:1,
+          max:100
+        },
       },
       name: {
         required: true,
@@ -63,8 +71,10 @@ delAction() {
     this.rules = {
       id: {
         required: true,
-        int: true,
-        min:1
+        int: {
+          min:1
+        },
+        method: 'get'
       }
     }
   }

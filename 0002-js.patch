@@ -1,0 +1,872 @@
+From 5962080c7ced86d2f769709756e71b2a4b78ced9 Mon Sep 17 00:00:00 2001
+From: zuoyanart <huabinglan@163.com>
+Date: Sat, 8 Sep 2018 18:10:45 +0800
+Subject: [PATCH 2/2] js
+
+---
+ .../site/ejs/mysql/controller/controller.tpl  | 111 +++----
+ static/site/ejs/mysql/logic/logic.tpl         |  74 +++++
+ static/site/ejs/mysql/model/model.tpl         | 123 ++++----
+ static/site/ejs/mysql/validate/validate.tpl   |  31 --
+ static/site/index/index.js                    | 270 +++++++++---------
+ static/view/index.html                        |  26 +-
+ 6 files changed, 353 insertions(+), 282 deletions(-)
+ create mode 100644 static/site/ejs/mysql/logic/logic.tpl
+ delete mode 100644 static/site/ejs/mysql/validate/validate.tpl
+
+diff --git a/static/site/ejs/mysql/controller/controller.tpl b/static/site/ejs/mysql/controller/controller.tpl
+index 5e55816..d46ad86 100644
+--- a/static/site/ejs/mysql/controller/controller.tpl
++++ b/static/site/ejs/mysql/controller/controller.tpl
+@@ -1,17 +1,20 @@
+-<?php
+ /**
+- * User:
+- * mail:
+- * Date:
+- * Des:
+- * Generate: entityAuto@huabinglan@163.com
++ * @Author: 左盐
++ * @Date:   2018-05-07 23:05:40
++ * @Email:  huabinglan@163.com
++ * @Project: xxx
++ * @Last modified by:   左盐
++ * @Last modified time: 2018-05-12 17:07:54
+  */
+ 
+-namespace app\<%= rootpath%>\controller;
+-use app\<%= rootpath%>\model\<%= firstUpTableName%> as <%= firstUpTableName%>Model;
++const Base = require('./base.js');
+ 
+-class <%= firstUpTableName%> extends Base
+-{
++module.exports = class extends Base {
++  constructor(ctx) {
++    super(ctx);
++    this.<%= tablename.toLowerCase()%>S = this.service('<%= tablename.toLowerCase()%>');
++    this.<%= tablename.toLowerCase()%>M = this.model('<%= tablename.toLowerCase()%>');
++  }
+   /**
+    * @api {get} /<%= url%>/:id 获取<%= china%>
+    * @apiName get <%= tablename.toLowerCase()%>
+@@ -21,18 +24,14 @@ class <%= firstUpTableName%> extends Base
+    * @apiSampleRequest /<%= url%>/:id
+    * @apiParam {int} id<%= china%>的id
+    * @apiSuccess {json} data 数据
+-   * @apiSuccess {int} code 0成功，其他为错误码
++   * @apiSuccess {int} code 200成功，其他为错误码
+    * @apiSuccess {string} message 错误信息<%for(var i=0,ll=data.length; i<ll;i++) {%>
+    * @apiSuccess {<%= data[i].valtype%>} --<%= data[i].key%> <%= data[i].note%>(<%= data[i].validate%>)<%}%>
+    */
+-  public function  read( <%= firstUpTableName%>Model $<%= tablename.toLowerCase()%>, $id=0)
+-  {
+-      $check = $this->validate($id,'<%= firstUpTableName%>.read');
+-      if($check !== true) {
+-        return apiJson([], -1, $check);
+-      }
+-      $json = $<%= tablename.toLowerCase()%>->read($id);
+-      return apiJson($json);
++  async getAction() {
++        let param = tools.xss(this.post());
++        let doc = await this.<%= tablename.toLowerCase()%>M.get(param.id);
++        return this.jsonOk(doc);
+   }
+ 
+   /**
+@@ -48,17 +47,18 @@ class <%= firstUpTableName%> extends Base
+   * @apiSuccess {string} message 错误信息
+   * @apiPermission admin
+    */
+-  public function  update(<%= firstUpTableName%>Model $<%= tablename.toLowerCase()%>, $id=0)
+-  {
+-    $param = input('put.');
+-    $check = $this->validate($param,'<%= firstUpTableName%>.update');
+-    if($check !== true) {
+-      return apiJson([], -1, $check);
++ async editNameAction() {
++    const param = tools.xss(this.post());
++    const uid = this.cookie('id');
++    const doc = await this.this.<%= tablename.toLowerCase()%>M.edit(param.id, uid, {
++      name: param.name
++    });
++    if(doc === 1) {
++      return this.jsonOk(doc);
++    } else {
++      return this.jsonFail();
+     }
+-    $json =  $<%= tablename.toLowerCase()%>->editData($param, $id);
+-    return apiJson($json);
+   }
+-
+   /**
+   * @api {post} /<%= url%> 创建<%= china%>
+   * @apiName create <%= tablename.toLowerCase()%>
+@@ -72,15 +72,17 @@ class <%= firstUpTableName%> extends Base
+   * @apiSuccess {string} message 错误信息
+   * @apiPermission admin
+    */
+-  public function  save(<%= firstUpTableName%>Model $<%= tablename.toLowerCase()%>)
+-  {
+-    $param = input('post.');
+-    $check = $this->validate($param,'<%= firstUpTableName%>.save');
+-    if($check !== true) {
+-      return apiJson([], -1, $check);
+-    }
+-      $data = $<%= tablename.toLowerCase()%>->saveData($param);
+-      return apiJson($data);
++ async createAction() {
++    const param = tools.xss(this.post());
++    const uid = this.cookie('id');
++    param['uid'] = uid;
++    const doc = await this.<%= tablename.toLowerCase()%>M.create(param).catch(err => {
++      return think.isError(err) ? err : new Error(err);
++    });
++    if (think.isError(doc)) {
++      return this.jsonFail(doc);
++    };
++    return this.jsonOk(doc);
+   }
+ 
+   /**
+@@ -98,15 +100,15 @@ class <%= firstUpTableName%> extends Base
+   * @apiSuccess {string} message 错误信息
+   * @apiPermission admin
+    */
+-  public function  index(<%= firstUpTableName%>Model $<%= tablename.toLowerCase()%>)
+-  {
+-      $param = input('get.');
+-      $check = $this->validate($param,'<%= firstUpTableName%>.index');
+-      if($check !== true) {
+-        return apiJson([], -1, $check);
+-      }
+-      $json =  $<%= tablename.toLowerCase()%>->page($param['kw'],  $param['cp'], $param['mp']);
+-      return apiJson($json);
++  async pageAction() {
++      let param = tools.xss(this.post());
++      let doc = await this.<%= tablename.toLowerCase()%>M.page(param.name, this.cookie('id'), param.cp, param.mp).catch(err => {
++      return think.isError(err) ? err : new Error(err);
++    });
++    if (think.isError(doc)) {
++      return this.jsonFail(doc);
++    };
++    return this.jsonOk(doc);
+   }
+ 
+   /**
+@@ -123,14 +125,15 @@ class <%= firstUpTableName%> extends Base
+   * @apiSuccess {string} message 错误信息
+   * @apiPermission admin
+    */
+-  public function  delete(<%= firstUpTableName%>Model $<%= tablename.toLowerCase()%>, $id=0)
+-  {
+-    $check = $this->validate($id,'<%= firstUpTableName%>.delete');
+-    if($check !== true) {
+-      return apiJson([], -1, $check);
+-    }
+-    $json =  $<%= tablename.toLowerCase()%>->remove($id);
+-    return apiJson($json);
++  async delAction() {
++    const param = tools.xss(this.post());
++    const number = await this.<%= tablename.toLowerCase()%>M.del(param.id, this.cookie('id')).catch(err => {
++      return think.isError(err) ? err : new Error(err);
++    });
++    if (think.isError(doc)) {
++      return this.jsonFail(doc);
++    };
++    return this.jsonOk();
+   }
+ 
+ }
+diff --git a/static/site/ejs/mysql/logic/logic.tpl b/static/site/ejs/mysql/logic/logic.tpl
+new file mode 100644
+index 0000000..0b81f37
+--- /dev/null
++++ b/static/site/ejs/mysql/logic/logic.tpl
+@@ -0,0 +1,74 @@
++/**
++ * logic
++ * @param  {} []
++ * @return {}     []
++ */
++module.exports = class extends think.Logic {
++
++  getAction() {
++    this.rules = {
++      id: {
++        required: true,
++        int: true,
++        min:1
++      },
++    }
++  }
++
++  editNameAction() {
++    this.rules = {
++      id: {
++        required: true,
++        int: true,
++      },
++      name: {
++        required: true,
++        length: {
++          min: 1,
++          max: 20
++        }
++      },
++    }
++  }
++
++  createAction() {
++    this.rules = {
++      <%for(var i=0,ll=data.length; i<ll;i++) {%>
++       <%= data[i].key%>:<%= data[i].validate%>,
++      <%}%>
++    }
++  }
++
++pageAction() {
++    this.rules = {
++      cp: {
++        required: true,
++        int: true,
++      },
++      mp:{
++        required: true,
++        int: true,
++      },
++      name: {
++        required: true,
++        length: {
++          min: 1,
++          max: 20
++        }
++      },
++    }
++  }
++
++delAction() {
++    this.rules = {
++      id: {
++        required: true,
++        int: true,
++        min:1
++      }
++    }
++  }
++
++
++
++}
+\ No newline at end of file
+diff --git a/static/site/ejs/mysql/model/model.tpl b/static/site/ejs/mysql/model/model.tpl
+index 1cbadc8..cbbe303 100644
+--- a/static/site/ejs/mysql/model/model.tpl
++++ b/static/site/ejs/mysql/model/model.tpl
+@@ -1,59 +1,80 @@
+-<?php
+ /**
+- * User: 
+- * mail:
+- * Date:
+- * Des:
+- * Generate: entityAuto@huabinglan@163.com
++ * @Author: 左盐
++ * @Date:   2018-06-06 23:39:27
++ * @Email:  huabinglan@163.com
++ * @Project: xxx
++ * @Last modified by:   左盐
++ * @Last modified time: 2018-06-06 23:39:27
+  */
+-
+-namespace app\<%= rootpath%>\model;
+-use think\Model;
+-
+-/**
+-  *
+-  * @param $id
+-  * @return array|false|\PDOStatement|string|Model
+-  */
+-class <%= firstUpTableName%> extends Model
+-{
+-	public function read($id) {
+-		return $this->find($id);
+-}
+ /**
+- *
+- * @param $useradminInfo
+- * @return false|int
++ * 数据源
+  */
+-	public function saveData($<%= tablename.toLowerCase()%>Info)
+-	{
+-		return $this->allowField(true)->save($<%= tablename.toLowerCase()%>Info);
++module.exports = class extends think.Model {
++  /**
++   * 获取列表
++   * @param  {[type]}  kw [description]
++   * @param  {[type]}  cp [description]
++   * @param  {[type]}  mp [description]
++   * @return {Promise}    [description]
++   */
++  async page(uid, cp = 1, mp = 30) {
++    const where = {
++      uid: uid
++    };
++    const rows = await this.where(where)
++      .field('id,name')
++      .order('id desc')
++      .limit((cp - 1) * mp, mp).countSelect();
++    return {
++      data: rows.data,
++      total: rows.count
++    };
+   }
+   /**
+-   *
+-   * @param $useradminInfo
+-   * @return false|int
++   * 创建
++   * @method create
++   * @param  {[type]} node [description]
++   * @return {[type]}      [description]
+    */
+-		 public function editData($<%= tablename.toLowerCase()%>Info,$id) {
+-		     return $this->allowField(true)->save($<%= tablename.toLowerCase()%>Info, ['id'=>$id]);
+-		 }
+-     /**
+-       *
+-       * @param $id
+-       * @return int
+-       */
+-		 public function remove($id) {
+-		  return $this->where('id','in', explode(',', $id))->delete();
+-		}
+-    /**
+-     *
+-     * @param mixed $kw
+-     * @param mixed|null $cp
+-     * @param $mp
+-     * @return false|\PDOStatement|string|\think\Collection
+-     */
+-		public function page($kw, $cp, $mp) {
+-				return $this->where('title', 'like', '%'.$kw.'%')->select();
+-		}
++  async create(json) {
++    const id = await this.add(json);
++    return id;
++  }
+ 
+-	 }
++  /**
++   * 获取
++   * @method get
++   * @param  {[type]} nodeid [description]
++   * @return {[type]}        [description]
++   */
++  async get(id, uid) {
++    const row = await this.where({
++      id: id,
++      uid: uid
++    }).find();
++    return row;
++  }
++  /**
++   *
++   * @param  {[type]}  json [description]
++   * @return {Promise}      [description]
++   */
++  async edit(uid, json) {
++    const row = await this.where({
++      uid
++    }).update(json);
++    return row;
++  }
++  /**
++   * 删除
++   * @param  {[type]}  id [description]
++   * @return {Promise}    [description]
++   */
++  async del(id, uid) {
++    const row = await this.where({
++      id: id,
++      uid: uid
++    }).delete();
++    return row;
++  }
++};
+diff --git a/static/site/ejs/mysql/validate/validate.tpl b/static/site/ejs/mysql/validate/validate.tpl
+deleted file mode 100644
+index 6a2a5a1..0000000
+--- a/static/site/ejs/mysql/validate/validate.tpl
++++ /dev/null
+@@ -1,31 +0,0 @@
+-<?php
+-/**
+- * User:
+- * mail:
+- * Date:
+- * Des:
+- * Generate: entityAuto@huabinglan@163.com
+- */
+-
+-namespace app\<%= rootpath%>\validate;
+-use think\Validate;
+-
+-class <%= firstUpTableName%> extends Validate
+-{
+-//规则
+-    protected $rule = [
+-          <%for(var i=0,ll=data.length;i<ll;i++) {%>
+-            '<%=data[i].key.toLowerCase()%>'=>  '<%- data[i].validate%>',<%}%>
+-            'cp'=>'',
+-            'mp'=>''
+-        ];
+-
+-//场景不同场景验证不同的字段
+-    protected $scene = [
+-        'read'    => ['id'],
+-        'index' =>['cp'=>'require|min:1','mp'=>'require|min:1'],
+-        'delete' =>['id'],
+-        'save'=>[<%for(var i=0,ll=data.length;i<ll;i++) {%><%if(data[i].key.toLowerCase() != 'id'){%>'<%= data[i].key.toLowerCase()%>',<%}}%>],
+-        'update'=>[<%for(var i=0,ll=data.length;i<ll;i++) {%>'<%= data[i].key.toLowerCase()%>',<%}%>],
+-    ];
+-}
+diff --git a/static/site/index/index.js b/static/site/index/index.js
+index a65e1c6..607f562 100644
+--- a/static/site/index/index.js
++++ b/static/site/index/index.js
+@@ -9,7 +9,7 @@
+  * 首页相关操作
+  * @return {[type]} [description]
+  */
+-var index = (function() {
++var index = (function () {
+   var self = {};
+   var fs = require('fs-extra');
+   var ejs = require("ejs");
+@@ -21,130 +21,130 @@ var index = (function() {
+    * 页面初始化
+    * @return {[type]} [description]
+    */
+-  self.init = function() {
+-      pageHisList("mysql");
+-      pageHisList("mongodb");
+-      $("#dbtype").pizzaSelect({ //模拟下拉
+-        onChange: function(obj) {
+-          var val = obj.attr("data");
+-          switch (val) {
+-            case "mysql":
+-              $(".mysql").css("display", "block");
+-              $(".mongodb").css("display", "none");
+-              break;
+-            case "mongodb":
+-              $(".mysql").css("display", "none");
+-              $(".mongodb").css("display", "block");
+-              break;
+-            default:
++  self.init = function () {
++    pageHisList("mysql");
++    pageHisList("mongodb");
++    $("#dbtype").pizzaSelect({ //模拟下拉
++      onChange: function (obj) {
++        var val = obj.attr("data");
++        switch (val) {
++          case "mysql":
++            $(".mysql").css("display", "block");
++            $(".mongodb").css("display", "none");
++            break;
++          case "mongodb":
++            $(".mysql").css("display", "none");
++            $(".mongodb").css("display", "block");
++            break;
++          default:
+ 
+-          }
+         }
+-      });
++      }
++    });
+ 
+ 
+-      $(".file").change(function() { //点击选择文件目录
+-        var val = $(this).val();
+-        if (val != '') {
+-          $("#file").val(val);
+-        }
+-      });
++    $(".file").change(function () { //点击选择文件目录
++      var val = $(this).val();
++      if (val != '') {
++        $("#file").val(val);
++      }
++    });
+ 
+-      $("tfoot").find(".addrow").click(function() { //添加行
+-        addRow($(this));
+-      });
+-      $("tfoot").find(".generate").click(function() { //生成文件
+-        generateFile();
+-      });
+-      $("tbody").on("click", ".delrow", function() { //删除行
+-        delRow($(this));
+-      });
++    $("tfoot").find(".addrow").click(function () { //添加行
++      addRow($(this));
++    });
++    $("tfoot").find(".generate").click(function () { //生成文件
++      generateFile();
++    });
++    $("tbody").on("click", ".delrow", function () { //删除行
++      delRow($(this));
++    });
+ 
+-      $("tbody").on("blur", ".key,.validate", function() {
+-        keyBlur($(this));
+-      });
++    $("tbody").on("blur", ".key,.validate", function () {
++      keyBlur($(this));
++    });
+ 
+-      $("#mysqllogin").on("click", function() {
+-        layer.load(1);
+-        mysqlQuery("show databases", [], function(err, result) {
+-          layer.closeAll();
+-          resetPizzaSelect($("#choosedb"), "choosedb");
+-          var s = '<option value="" selected="selected">请选择数据库</option>';
+-          for (var i = 0, ll = result.length; i < ll; i++) {
+-            s += '<option value="' + result[i].Database + '">' + result[i].Database + '</option>';
+-          }
+-          $("#choosedb").html(s);
+-          $("#choosedb").pizzaSelect({
+-            onChange: function(obj) {
+-              var val = obj.attr("data");
+-              if (val != "") {
+-                layer.load(1);
+-                mysqlQuery("SELECT TABLE_NAME,TABLE_ROWS FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='" + val + "';", [], function(err, tablename) {
+-                  layer.closeAll();
+-                  resetPizzaSelect($("#mysql-tablename"), "mysql-tablename");
+-                  var ss = '<option value="" selected="selected">请选择表</option>';
+-                  console.log(tablename);
+-                  for (var i = 0, ll = tablename.length; i < ll; i++) {
+-                    ss += '<option value="' + tablename[i].TABLE_NAME + '">' + tablename[i].TABLE_NAME + '</option>';
+-                  }
+-                  $("#mysql-tablename").html(ss);
+-                  $("#mysql-tablename").pizzaSelect({
+-                    onChange: function(obj) {
+-                      var val = obj.attr("data");
+-                      if (val != "") {
+-                        layer.load(1);
+-                        mysqlQuery("select  column_name as name, data_type as type, COLUMN_default as def, is_nullable as  nullable,character_maximum_length as charlen,column_comment as brief from Information_schema.columns  where table_Name = '"+val+"' and table_schema='"+  $("#choosedb").val()+"';", function(err, result) {
+-                          layer.closeAll();
+-                          var json = {};
+-                          var data = [];
+-                          var item = {};
+-                          var columnAttr = {};
+-                          json.china = '';
+-                          json.rootpath = "";
+-                          json.tablename = "";
+-                          json.url = "";
+-                          console.log(result);
+-                          console.log(result.length);
+-                          for (var j = 0, jj = result.length; j < jj; j++) {
+-                            item = {};
+-                            columnAttr = getJsonBySql(result[j]);
+-                            item.key = result[j].name;
+-                            item.valtype = result[j].type.replace("varchar","string").replace("char","string");
+-                            if (item.key == "id") {
+-                              item.validate = "require|number|min:1";
+-                              item.json = 'json:"id" gorm:"primary_key;AUTO_INCREMENT" validate:"omitempty,min=1"';
+-                                item.note = "主键id";
+-                            } else {
+-                              item.json = columnAttr.json;
+-                              item.validate = columnAttr.validate;
+-                              item.note = result[j].brief;
+-                            }
+-                            data.push(item);
++    $("#mysqllogin").on("click", function () {
++      layer.load(1);
++      mysqlQuery("show databases", [], function (err, result) {
++        layer.closeAll();
++        resetPizzaSelect($("#choosedb"), "choosedb");
++        var s = '<option value="" selected="selected">请选择数据库</option>';
++        for (var i = 0, ll = result.length; i < ll; i++) {
++          s += '<option value="' + result[i].Database + '">' + result[i].Database + '</option>';
++        }
++        $("#choosedb").html(s);
++        $("#choosedb").pizzaSelect({
++          onChange: function (obj) {
++            var val = obj.attr("data");
++            if (val != "") {
++              layer.load(1);
++              mysqlQuery("SELECT TABLE_NAME,TABLE_ROWS FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='" + val + "';", [], function (err, tablename) {
++                layer.closeAll();
++                resetPizzaSelect($("#mysql-tablename"), "mysql-tablename");
++                var ss = '<option value="" selected="selected">请选择表</option>';
++                console.log(tablename);
++                for (var i = 0, ll = tablename.length; i < ll; i++) {
++                  ss += '<option value="' + tablename[i].TABLE_NAME + '">' + tablename[i].TABLE_NAME + '</option>';
++                }
++                $("#mysql-tablename").html(ss);
++                $("#mysql-tablename").pizzaSelect({
++                  onChange: function (obj) {
++                    var val = obj.attr("data");
++                    if (val != "") {
++                      layer.load(1);
++                      mysqlQuery("select  column_name as name, data_type as type, COLUMN_default as def, is_nullable as  nullable,character_maximum_length as charlen,column_comment as brief from Information_schema.columns  where table_Name = '" + val + "' and table_schema='" + $("#choosedb").val() + "';", function (err, result) {
++                        layer.closeAll();
++                        var json = {};
++                        var data = [];
++                        var item = {};
++                        var columnAttr = {};
++                        json.china = '';
++                        json.rootpath = "";
++                        json.tablename = "";
++                        json.url = "";
++                        console.log(result);
++                        console.log(result.length);
++                        for (var j = 0, jj = result.length; j < jj; j++) {
++                          item = {};
++                          columnAttr = getJsonBySql(result[j]);
++                          item.key = result[j].name;
++                          item.valtype = result[j].type.replace("varchar", "string").replace("char", "string");
++                          if (item.key == "id") {
++                            item.validate = `{reruired: true}`; //"require|number|min:1";
++                            item.json = '';
++                            item.note = "主键id";
++                          } else {
++                            item.json = columnAttr.json;
++                            item.validate = columnAttr.validate;
++                            item.note = result[j].brief;
+                           }
+-                          json.data = data;
+-                          console.log(json);
+-                          addRow($('.mysqladdrow'), json);
+-                        });
+-                      }
++                          data.push(item);
++                        }
++                        json.data = data;
++                        console.log(json);
++                        addRow($('.mysqladdrow'), json);
++                      });
+                     }
+-                  });
+-
++                  }
+                 });
+-              }
++
++              });
+             }
+-          });
+-        })
+-      });
++          }
++        });
++      })
++    });
+ 
+-      for (var i = 0; i < 5; i++) { //初始化5条数据
+-        $("tfoot").find(".addrow").click();
+-      }
++    for (var i = 0; i < 5; i++) { //初始化5条数据
++      $("tfoot").find(".addrow").click();
+     }
+-    /**
+-     * 添加行
+-     * @method addRow
+-     * @param  {[type]} obj [description]
+-     */
++  }
++  /**
++   * 添加行
++   * @method addRow
++   * @param  {[type]} obj [description]
++   */
+   function addRow(obj, data) {
+     var tpl = __inline("index.ejs");
+     if (!data) {
+@@ -221,7 +221,7 @@ var index = (function() {
+     s += '<option value="all">清除历史记录</option>';
+     obj.html(s);
+     obj.pizzaSelect({
+-      onChange: function(obj) {
++      onChange: function (obj) {
+         var his = obj.attr("data");
+         var db = getDBType();
+         if (his == "30day" || his == "all") {
+@@ -253,22 +253,26 @@ var index = (function() {
+     console.log(db);
+     console.log(json);
+     if (json) {
+-      var fileDir = ["controller", "model", 'validate'];
++      var fileDir = ["controller", "model", 'logic'];
+       var tplstr = '';
+       var generatePath = $.trim($("#file").val()); //生成文件的根目录
+       json.rootpath = generatePath.split("\\").pop();
+       json.url = $.trim($("#" + db + "-url").val());
+       json.reltablename = $.trim($("#" + db + "-tablename").val());
+-      if(json.reltablename.indexOf("_") > -1) {
+-          var nameArray = json.reltablename.split('_');
+-          nameArray.shift();
+-          json.tablename = nameArray.join("").toLowerCase().replace(/^\S/,function(s){return s.toUpperCase();});
++      if (json.reltablename.indexOf("_") > -1) {
++        var nameArray = json.reltablename.split('_');
++        nameArray.shift();
++        json.tablename = nameArray.join("").toLowerCase().replace(/^\S/, function (s) {
++          return s.toUpperCase();
++        });
+       } else {
+         json.tablename = json.reltablename;
+       }
+ 
+       json.china = $.trim($("#" + db + "-china").val());
+-      json.firstUpTableName = json.tablename.replace(/^\S/,function(s){return s.toUpperCase();})
++      json.firstUpTableName = json.tablename.replace(/^\S/, function (s) {
++        return s.toUpperCase();
++      })
+       // json.firstUpTableName = json.tablename.toLowerCase().replace(/^\S/, function(s) {
+       // return s.toUpperCase();
+       // });
+@@ -283,7 +287,7 @@ var index = (function() {
+       for (var i = 0, ll = fileDir.length; i < ll; i++) {
+         tplstr = fs.readFileSync(appPath + "/site/ejs/" + db + "/" + fileDir[i] + "/" + fileDir[i] + ".tpl");
+         var s = ejs.compile(tplstr.toString())(json);
+-        var spath = generatePath + "\\" + fileDir[i] + "\\" + json.firstUpTableName + ".php";
++        var spath = generatePath + "\\" + fileDir[i] + "\\" + json.firstUpTableName.toLowerCase() + ".js";
+         fs.outputFileSync(spath, s);
+ 
+         // tplteststr = fs.readFileSync(appPath + "/site/ejs/" + db + "/" + fileDir[i] + "/" + fileDir[i] + "_test.tpl");
+@@ -317,7 +321,7 @@ var index = (function() {
+     var data = [];
+     var item = {};
+     var tds;
+-    $("." + dbtype + "key > tr").each(function(i, o) {
++    $("." + dbtype + "key > tr").each(function (i, o) {
+       item = {};
+       tds = $(o).find("td");
+ 
+@@ -364,7 +368,7 @@ var index = (function() {
+       password: $.trim($("#mysqlpwd").val()),
+       port: $.trim($("#mysqlport").val())
+     });
+-    pool.getConnection(function(err, conn) { //创建一个连接
++    pool.getConnection(function (err, conn) { //创建一个连接
+       if (err) {
+         alert(err);
+         return;
+@@ -380,8 +384,8 @@ var index = (function() {
+    * @return {[type]}         [description]
+    */
+   function mysqlQuery(sql, param, cb) {
+-    mysqlLogin(function(conn) {
+-      conn.query(sql, param, function(err, result) {
++    mysqlLogin(function (conn) {
++      conn.query(sql, param, function (err, result) {
+         cb(err, result);
+       });
+     });
+@@ -396,11 +400,11 @@ var index = (function() {
+     var data = {};
+ 
+     if (column.type.indexOf("char") > -1) {
+-      data.json = 'json:"' + column.name + '" sql:"type:' + column.type + '(' + column.charlen + ');default:\'' + column.def + '\'" validate:"omitempty,min=1,max=' + (parseInt(column.charlen) * 2) + ','+getRegValite(column.name)+'"';
+-      data.validate = 'require|min:1|max:' + (parseInt(column.charlen) * 2);
+-    } else if(column.type == "int") {
+-        data.json = 'json:"' + column.name + '" sql:"default:' + column.def + '" validate:"omitempty,min=1,'+getRegValite(column.name)+'"';
+-        data.validate = 'require|number|min:1';
++      data.json = 'json:"' + column.name + '" sql:"type:' + column.type + '(' + column.charlen + ');default:\'' + column.def + '\'" validate:"omitempty,min=1,max=' + (parseInt(column.charlen) * 2) + ',' + getRegValite(column.name) + '"';
++      data.validate = '{required: true,string: true,length: { min: 1,max: ' + (parseInt(column.charlen)) * 2 + '}}';
++    } else if (column.type == "int" || column.type == "tinyint") {
++      data.json = 'json:"' + column.name + '" sql:"default:' + column.def + '" validate:"omitempty,min=1,' + getRegValite(column.name) + '"';
++      data.validate = '{required: true,int: {min: 1,}}';
+     }
+     return data;
+   }
+@@ -411,15 +415,15 @@ var index = (function() {
+    * @return {[type]}          [description]
+    */
+   function getRegValite(name) {
+-    if(name.indexOf("mail") > -1) {
++    if (name.indexOf("mail") > -1) {
+       return "email";
+-    } else if(name.indexOf("url") > -1 || name.indexOf("link") > -1) {
++    } else if (name.indexOf("url") > -1 || name.indexOf("link") > -1) {
+       return "url";
+-    } else if(name == "ip") {
++    } else if (name == "ip") {
+       return "ip";
+     }
+     return "";
+   }
+ 
+   return self;
+-}());
++}());
+\ No newline at end of file
+diff --git a/static/view/index.html b/static/view/index.html
+index 2695782..1f25d30 100644
+--- a/static/view/index.html
++++ b/static/view/index.html
+@@ -28,9 +28,9 @@
+       <legend>&nbsp;&nbsp;mongodb&nbsp;&nbsp;</legend>
+       <div class="form">
+         <div><label for="">历史记录</label><select name="" id="mongodbhisstore" style="width:300px;height:30px;">
+-          <option value="" selected="selected">切换到历史记录</option>
+-          <option value="clear">清除一月前历史记录</option>
+-        </select></div>
++            <option value="" selected="selected">切换到历史记录</option>
++            <option value="clear">清除一月前历史记录</option>
++          </select></div>
+         <div><label for="">表名</label><input type="text" placeholder="务必使用大驼峰式命名法" id="mongodb-tablename" class="tablename"></div>
+         <div><label for="">中文名称</label><input type="text" placeholder="请输入中文名称" id="mongodb-china" class="china"></div>
+         <div><label for="">url地址</label><input type="text" placeholder="请输入连接地址" id="mongodb-url" class="url"></div>
+@@ -63,18 +63,18 @@
+       <legend>&nbsp;&nbsp;mysql&nbsp;&nbsp;</legend>
+       <div class="form">
+         <div><label for="">历史记录</label><select name="" id="mysqlhisstore" style="width:300px;height:30px;">
+-          <option value="" selected="selected">切换到历史记录</option>
+-          <option value="clear">清除一月前历史记录</option>
+-        </select></div>
++            <option value="" selected="selected">切换到历史记录</option>
++            <option value="clear">清除一月前历史记录</option>
++          </select></div>
+         <hr>
+         <div>
+-          <label for="">host</label><input type="text" class="请输入主机地址" id="mysqlhost">
++          <label for="">host</label><input type="text" class="请输入主机地址" id="mysqlhost" value="192.168.136.128">
+         </div>
+         <div>
+-          <label for="">usr</label><input type="text" placeholder="请输入账户" value="root" id="mysqlusr">
++          <label for="">usr</label><input type="text" placeholder="请输入账户" value="root" id="mysqlusr" value="root">
+         </div>
+         <div>
+-          <label for="">pwd</label><input type="password" placeholder="请输入密码" id="mysqlpwd">
++          <label for="">pwd</label><input type="password" placeholder="请输入密码" id="mysqlpwd" value="aa123456">
+         </div>
+         <div>
+           <label for="">port</label><input type="text" placeholder="请输入端口号" id="mysqlpwd" value="3306">
+@@ -87,10 +87,10 @@
+           </select>
+         </div>
+         <div><label for="">表名</label><select id="mysql-tablename" class="tablename">
+-          <option value="">请选择表名</option>
+-        </select></div>
++            <option value="">请选择表名</option>
++          </select></div>
+         <div><label for="">中文名称</label><input type="text" placeholder="请输入中文名称" id="mysql-china" class="china"></div>
+-        <div><label for="">url地址</label><input type="text" placeholder="请输入连接地址" id="mysql-url" class="url" ></div>
++        <div><label for="">url地址</label><input type="text" placeholder="请输入连接地址" id="mysql-url" class="url"></div>
+       </div>
+       <table>
+         <thead>
+@@ -123,4 +123,4 @@
+   </script>
+ </body>
+ 
+-</html>
++</html>
+\ No newline at end of file
+-- 
+2.18.0.windows.1
+
